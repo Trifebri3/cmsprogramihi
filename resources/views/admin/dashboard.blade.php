@@ -1,4 +1,4 @@
-﻿@extends('layouts.super-admin.app')
+@extends('layouts.super-admin.app')
 
 @section('header')
         <div class="flex justify-between items-center">
@@ -169,7 +169,17 @@
                                         <div class="text-xs text-gray-400">Theme: {{ $p->theme->name }}</div>
                                     </td>
                                     <td class="px-6 py-4 text-sm text-gray-500 font-mono">
-                                        {{ $p->subdomain ? $p->subdomain . '.localhost' : 'None' }}
+                                        @php
+                                            $currentHost = request()->getHost();
+                                            $currentHost = preg_replace('/^www\./i', '', $currentHost);
+                                        @endphp
+                                        @if($p->custom_domain)
+                                            <span class="text-indigo-600 font-bold">{{ $p->custom_domain }}</span>
+                                        @elseif($p->subdomain)
+                                            {{ $p->subdomain . '.' . $currentHost }}
+                                        @else
+                                            <span class="text-gray-300">None</span>
+                                        @endif
                                     </td>
                                     <td class="px-6 py-4">
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-50 text-green-700">
