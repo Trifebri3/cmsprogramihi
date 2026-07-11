@@ -1,0 +1,94 @@
+﻿@extends('layouts.super-admin.app')
+
+@section('header')
+        <h2 class="font-semibold text-xl text-slate-800 leading-tight">
+            {{ __('Provision New Program Sub-site') }}
+        </h2>
+@endsection
+
+@section('content')
+
+    <div class="py-12">
+        <div class="max-w-xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-2xl border border-gray-100 p-8 space-y-6">
+                
+                @if ($errors->any())
+                    <div class="p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-sm font-semibold">
+                        <ul class="list-disc pl-5 space-y-1">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                <form action="{{ route('admin.programs.store') }}" method="POST" class="space-y-6">
+                    @csrf
+
+                    <div>
+                        <label for="name" class="block text-sm font-semibold text-gray-700 mb-2">Nama Program / Institusi</label>
+                        <input type="text" name="name" id="name" value="{{ old('name') }}" required class="w-full rounded-xl border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-sm bg-white" placeholder="Contoh: Ashoka Indonesia">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="slug" class="block text-sm font-semibold text-gray-700 mb-2">Slug URL</label>
+                            <input type="text" name="slug" id="slug" value="{{ old('slug') }}" required class="w-full rounded-xl border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-sm bg-white" placeholder="ashoka-id">
+                        </div>
+
+                        <div>
+                            <label for="subdomain" class="block text-sm font-semibold text-gray-700 mb-2">Subdomain</label>
+                            <input type="text" name="subdomain" id="subdomain" value="{{ old('subdomain') }}" class="w-full rounded-xl border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-sm bg-white" placeholder="ashoka">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="custom_domain" class="block text-sm font-semibold text-gray-700 mb-2">Custom Domain (Opsional)</label>
+                        <input type="text" name="custom_domain" id="custom_domain" value="{{ old('custom_domain') }}" class="w-full rounded-xl border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-sm bg-white" placeholder="ashoka.org">
+                    </div>
+
+                    <div>
+                        <label for="template_type" class="block text-sm font-semibold text-gray-700 mb-2">Preset Template Website</label>
+                        <select name="template_type" id="template_type" required class="w-full rounded-xl border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-sm bg-white">
+                            <option value="ngo">NGO Internasional Template (Sage Green & Poppins)</option>
+                            <option value="kampus">Kampus / Akademik Template (Navy Blue & Playfair)</option>
+                            <option value="csr">Company CSR / Korporat Template (Teal & Montserrat)</option>
+                            <option value="custom">Custom (Warna Standard & Menu Kosong)</option>
+                        </select>
+                        <p class="text-xs text-gray-400 mt-1">Sistem akan secara otomatis membuat skema warna, jenis font Google Fonts, dan menu navigasi default.</p>
+                    </div>
+
+                    <div>
+                        <label for="admin_user_id" class="block text-sm font-semibold text-gray-700 mb-2">Penanggung Jawab (Program Admin)</label>
+                        <select name="admin_user_id" id="admin_user_id" required class="w-full rounded-xl border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-sm bg-white">
+                            <option value="" disabled selected>Pilih User...</option>
+                            @foreach($users as $user)
+                                <option value="{{ $user->id }}" {{ old('admin_user_id') == $user->id ? 'selected' : '' }}>
+                                    {{ $user->name }} ({{ $user->email }})
+                                </option>
+                            @endforeach
+                        </select>
+                        <p class="text-xs text-gray-400 mt-1">Setiap program wajib dikelola oleh satu orang penanggung jawab (Program Admin).</p>
+                    </div>
+
+                    <div>
+                        <label for="status" class="block text-sm font-semibold text-gray-700 mb-2">Status Sub-site</label>
+                        <select name="status" id="status" required class="w-full rounded-xl border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-sm bg-white">
+                            <option value="active">Aktif</option>
+                            <option value="inactive">Non-aktif / Draft</option>
+                        </select>
+                    </div>
+
+                    <div class="flex justify-end gap-4 border-t border-gray-150 pt-6">
+                        <a href="{{ route('dashboard') }}" class="inline-flex items-center px-4 py-2 border border-gray-250 text-xs font-bold rounded-xl text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition">
+                            Batal
+                        </a>
+                        <button type="submit" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-xl font-bold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 active:bg-indigo-900 transition shadow-sm">
+                            Provision Program
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+@endsection
