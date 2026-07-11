@@ -157,7 +157,7 @@ class CategoryManagementTest extends TestCase
 
         // Set subdomain context
         $response = $this->withHeaders(['Host' => 'program-demo.localhost'])
-            ->get('/p/program-demo/category/kategori-publik');
+            ->get('/program-demo/category/kategori-publik');
 
         $response->assertStatus(200);
         $response->assertSee('Post Tagged');

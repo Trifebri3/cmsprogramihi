@@ -61,7 +61,7 @@ class Program extends Model
             return url('/' . ltrim($path, '/'));
         }
 
-        return url('/p/' . $this->slug . '/' . ltrim($path, '/'));
+        return url('/' . $this->slug . '/' . ltrim($path, '/'));
     }
 
     public function theme(): BelongsTo

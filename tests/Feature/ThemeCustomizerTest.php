@@ -77,7 +77,7 @@ class ThemeCustomizerTest extends TestCase
         
         // Assert that the public theme page renders this new color
         $publicResponse = $this->withHeaders(['Host' => 'customizer-test.localhost'])
-            ->get('/p/customizer-test');
+            ->get('/customizer-test');
         $publicResponse->assertStatus(200);
         $publicResponse->assertSee('--color-primary: #112233');
         $publicResponse->assertSee('WhatsApp Link');

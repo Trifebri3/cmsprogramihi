@@ -66,7 +66,11 @@ class ProgramTenantRouter
                         $isSubsiteDomain = false;
                     }
                 }
-                if ($isSubsiteDomain || str_starts_with($request->getPathInfo(), '/p/')) {
+                
+                $route = $request->route();
+                $isSubsiteRoute = ($route && $route->hasParameter('program_slug'));
+
+                if ($isSubsiteDomain || $isSubsiteRoute) {
                     abort(404, 'Program profile not found or inactive.');
                 }
             }

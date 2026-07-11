@@ -34,7 +34,7 @@ class ProgramTenantTest extends TestCase
         ]);
 
         // Access the public subsite path
-        $response = $this->get('/p/generaz-test');
+        $response = $this->get('/generaz-test');
 
         $response->assertStatus(200);
         $response->assertSee('Generaz Berbakti Test');
@@ -48,7 +48,7 @@ class ProgramTenantTest extends TestCase
      */
     public function test_invalid_program_slug_returns_404(): void
     {
-        $response = $this->get('/p/non-existent-program');
+        $response = $this->get('/non-existent-program');
 
         $response->assertStatus(404);
     }

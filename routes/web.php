@@ -81,7 +81,10 @@ if ($isSubsiteDomain && !app()->runningInConsole()) {
     Route::middleware(['tenant'])->group($defineProgramRoutes);
 } else {
     // Route group B: Path-based fallback for local dev and direct access
-    Route::middleware(['tenant'])->prefix('p/{program_slug}')->group($defineProgramRoutes);
+    Route::middleware(['tenant'])
+        ->prefix('{program_slug}')
+        ->where(['program_slug' => '(?!login|register|dashboard|admin|cms|api|profile|logout|verify-email|password|confirm-password|forgot-password|reset-password)[a-zA-Z0-9_-]+'])
+        ->group($defineProgramRoutes);
 }
 
 require __DIR__.'/auth.php';
