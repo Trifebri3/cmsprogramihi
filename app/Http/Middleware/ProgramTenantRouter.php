@@ -18,7 +18,7 @@ class ProgramTenantRouter
         $host = $request->getHost();
         
         // Define base domains to exclude from subdomain routing
-        $baseDomains = ['localhost', '127.0.0.1', 'domain.com'];
+        $baseDomains = ['localhost', '127.0.0.1', 'domain.com', 'profil.instituthijauindonesia.or.id'];
         
         $program = null;
 

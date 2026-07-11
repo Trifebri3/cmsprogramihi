@@ -68,7 +68,7 @@ $defineProgramRoutes = function () {
 
 // Check if accessing subsite subdomain or custom domain
 $host = request()->getHost();
-$baseDomains = ['localhost', '127.0.0.1', 'domain.com'];
+$baseDomains = ['localhost', '127.0.0.1', 'domain.com', 'profil.instituthijauindonesia.or.id'];
 $isSubsiteDomain = true;
 foreach ($baseDomains as $baseDomain) {
     if ($host === $baseDomain || $host === 'www.' . $baseDomain) {

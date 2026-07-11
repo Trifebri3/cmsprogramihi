@@ -49,7 +49,7 @@ class Program extends Model
     public function url(string $path = ''): string
     {
         $host = request()->getHost();
-        $baseDomains = ['localhost', '127.0.0.1', 'domain.com'];
+        $baseDomains = ['localhost', '127.0.0.1', 'domain.com', 'profil.instituthijauindonesia.or.id'];
         $isSubsiteDomain = true;
         foreach ($baseDomains as $baseDomain) {
             if ($host === $baseDomain || $host === 'www.' . $baseDomain) {
