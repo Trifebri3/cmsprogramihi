@@ -26,15 +26,25 @@ class ProgramController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $rules = [
             'name' => 'required|string|max:255',
             'slug' => 'required|string|unique:programs,slug|max:255',
             'subdomain' => 'nullable|string|unique:programs,subdomain|max:255',
             'custom_domain' => 'nullable|string|unique:programs,custom_domain|max:255',
             'template_type' => 'required|string|in:ngo,kampus,csr,custom',
-            'admin_user_id' => 'required|exists:users,id',
             'status' => 'required|string|in:active,inactive',
-        ]);
+            'admin_user_type' => 'nullable|string|in:existing,new',
+        ];
+
+        if ($request->input('admin_user_type') === 'new') {
+            $rules['admin_name'] = 'required|string|max:255';
+            $rules['admin_email'] = 'required|email|unique:users,email|max:255';
+            $rules['admin_password'] = 'required|string|min:8|max:255';
+        } else {
+            $rules['admin_user_id'] = 'required|exists:users,id';
+        }
+
+        $request->validate($rules);
 
         // 1. Provision Theme based on selected template style
         $themeName = $request->name . ' Theme';
@@ -124,8 +134,18 @@ class ProgramController extends Controller
         }
 
         // 4. Assign Admin User to the Program
-        $adminUser = \App\Models\User::findOrFail($request->admin_user_id);
-        $adminUser->update(['program_id' => $program->id]);
+        if ($request->input('admin_user_type') === 'new') {
+            $adminUser = \App\Models\User::create([
+                'name' => $request->admin_name,
+                'email' => $request->admin_email,
+                'password' => bcrypt($request->admin_password),
+                'program_id' => $program->id,
+            ]);
+        } else {
+            $adminUser = \App\Models\User::findOrFail($request->admin_user_id);
+            $adminUser->update(['program_id' => $program->id]);
+        }
+        
         $adminUser->assignRole('program-admin');
 
         return redirect()->route('dashboard')->with('status', 'Program provisioned successfully with selected template theme, default menus, and assigned Program Admin.');

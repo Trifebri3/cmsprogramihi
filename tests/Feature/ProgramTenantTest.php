@@ -52,4 +52,45 @@ class ProgramTenantTest extends TestCase
 
         $response->assertStatus(404);
     }
+
+    /**
+     * Test that Super Admin can provision a program with a brand new admin user simultaneously.
+     */
+    public function test_super_admin_can_provision_program_with_new_admin_user(): void
+    {
+        $this->seed(\Database\Seeders\RoleAndUserSeeder::class);
+        
+        $superAdmin = \App\Models\User::create([
+            'name' => 'Super Admin Test',
+            'email' => 'superadmin@test.com',
+            'password' => bcrypt('password'),
+        ]);
+        $superAdmin->assignRole('super-admin');
+
+        $this->actingAs($superAdmin);
+
+        $response = $this->post('/admin/programs', [
+            'name' => 'Kemanusiaan Hijau',
+            'slug' => 'kemanusiaan-hijau',
+            'subdomain' => 'hijau',
+            'template_type' => 'ngo',
+            'status' => 'active',
+            'admin_user_type' => 'new',
+            'admin_name' => 'Doni Pratama',
+            'admin_email' => 'doni@hijau.org',
+            'admin_password' => 'securepassword123',
+        ]);
+
+        $response->assertRedirect('/dashboard');
+
+        // Assert program exists
+        $program = Program::where('slug', 'kemanusiaan-hijau')->first();
+        $this->assertNotNull($program);
+
+        // Assert user was created
+        $user = \App\Models\User::where('email', 'doni@hijau.org')->first();
+        $this->assertNotNull($user);
+        $this->assertEquals($program->id, $user->program_id);
+        $this->assertTrue($user->hasRole('program-admin'));
+    }
 }

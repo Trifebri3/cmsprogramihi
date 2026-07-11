@@ -165,8 +165,12 @@ class ThemeController extends Controller
             'banner' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
             'favicon' => 'nullable|image|mimes:jpeg,png,jpg,ico,svg|max:1024',
             'popup_media' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:3072',
-            'layout_config_json' => 'required|string',
+            'layout_config_json' => 'nullable|string',
             'menus_json' => 'nullable|string',
+            'contact_keys' => 'nullable|array',
+            'contact_keys.*' => 'nullable|string',
+            'contact_values' => 'nullable|array',
+            'contact_values.*' => 'nullable|string',
         ]);
 
         // 1. Process standard brand file uploads (Logo, Banner, Favicon)
@@ -205,6 +209,49 @@ class ThemeController extends Controller
             $layoutConfig['popup_banner']['media_url'] = asset('storage/' . $mediaPath);
         }
 
+        // Merge individual layout fields if present (e.g. from automated tests or direct forms)
+        if ($request->has('navbar_layout')) {
+            $layoutConfig['navbar'] = $request->navbar_layout;
+        }
+        if ($request->has('footer_layout')) {
+            $layoutConfig['footer'] = $request->footer_layout;
+        }
+        if ($request->has('hero_layout')) {
+            $layoutConfig['hero'] = $request->hero_layout;
+        }
+        if ($request->has('template_layout')) {
+            $layoutConfig['template_layout'] = $request->template_layout;
+        }
+
+        if (!isset($layoutConfig['sections']) || !is_array($layoutConfig['sections']) || empty($layoutConfig['sections'])) {
+            $layoutConfig['sections'] = [
+                [
+                    'id' => 'sec_hero_default',
+                    'type' => 'hero',
+                    'is_visible' => true,
+                    'title' => 'Mewujudkan Dampak Bersama Kami',
+                    'subtitle' => 'Kami merancang dan menjalankan program berkelanjutan untuk kemajuan bersama.'
+                ]
+            ];
+        }
+
+        foreach ($layoutConfig['sections'] as $idx => $section) {
+            if (($section['type'] ?? '') === 'hero') {
+                if ($request->has('hero_title')) {
+                    $layoutConfig['sections'][$idx]['title'] = $request->hero_title;
+                }
+                if ($request->has('hero_subtitle')) {
+                    $layoutConfig['sections'][$idx]['subtitle'] = $request->hero_subtitle;
+                }
+                if ($request->has('hero_btn_text')) {
+                    $layoutConfig['sections'][$idx]['btn_text'] = $request->hero_btn_text;
+                }
+                if ($request->has('hero_btn_url')) {
+                    $layoutConfig['sections'][$idx]['btn_url'] = $request->hero_btn_url;
+                }
+            }
+        }
+
         // 3. Rebuild Menus dynamically
         if ($request->filled('menus_json')) {
             $menusData = json_decode($request->input('menus_json'), true);
@@ -232,6 +279,22 @@ class ThemeController extends Controller
                     }
                 }
             }
+        }
+
+        // 3.5 Rebuild Contact Details
+        if ($request->has('contact_keys') && $request->has('contact_values')) {
+            $contactKeys = $request->input('contact_keys', []);
+            $contactValues = $request->input('contact_values', []);
+            $contactMap = [];
+            foreach ($contactKeys as $idx => $key) {
+                if (!empty($key)) {
+                    $contactMap[strtolower($key)] = [
+                        'label' => $key,
+                        'value' => $contactValues[$idx] ?? '',
+                    ];
+                }
+            }
+            $program->update(['contact' => $contactMap]);
         }
 
         // 4. Save Theme Data

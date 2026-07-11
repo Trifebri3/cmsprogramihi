@@ -1,4 +1,4 @@
-﻿@extends('layouts.super-admin.app')
+@extends('layouts.super-admin.app')
 
 @section('header')
         <h2 class="font-semibold text-xl text-slate-800 leading-tight">
@@ -58,17 +58,49 @@
                         <p class="text-xs text-gray-400 mt-1">Sistem akan secara otomatis membuat skema warna, jenis font Google Fonts, dan menu navigasi default.</p>
                     </div>
 
-                    <div>
-                        <label for="admin_user_id" class="block text-sm font-semibold text-gray-700 mb-2">Penanggung Jawab (Program Admin)</label>
-                        <select name="admin_user_id" id="admin_user_id" required class="w-full rounded-xl border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-sm bg-white">
-                            <option value="" disabled selected>Pilih User...</option>
-                            @foreach($users as $user)
-                                <option value="{{ $user->id }}" {{ old('admin_user_id') == $user->id ? 'selected' : '' }}>
-                                    {{ $user->name }} ({{ $user->email }})
-                                </option>
-                            @endforeach
-                        </select>
-                        <p class="text-xs text-gray-400 mt-1">Setiap program wajib dikelola oleh satu orang penanggung jawab (Program Admin).</p>
+                    <!-- Admin User Selection / Creation -->
+                    <div x-data="{ adminType: 'existing' }" class="space-y-4">
+                        <label class="block text-sm font-semibold text-gray-700">Akun Program Admin (Penanggung Jawab)</label>
+                        
+                        <div class="flex gap-4">
+                            <label class="inline-flex items-center text-xs font-semibold cursor-pointer">
+                                <input type="radio" name="admin_user_type" value="existing" x-model="adminType" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                <span class="ml-2 text-slate-700">Pilih User Terdaftar</span>
+                            </label>
+                            <label class="inline-flex items-center text-xs font-semibold cursor-pointer">
+                                <input type="radio" name="admin_user_type" value="new" x-model="adminType" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                <span class="ml-2 text-slate-700">Buat User Baru Sekaligus</span>
+                            </label>
+                        </div>
+
+                        <!-- Option A: Existing Users List -->
+                        <div x-show="adminType === 'existing'" class="space-y-2">
+                            <select name="admin_user_id" id="admin_user_id" :required="adminType === 'existing'" class="w-full rounded-xl border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-sm bg-white">
+                                <option value="" disabled selected>Pilih User...</option>
+                                @foreach($users as $user)
+                                    <option value="{{ $user->id }}" {{ old('admin_user_id') == $user->id ? 'selected' : '' }}>
+                                        {{ $user->name }} ({{ $user->email }})
+                                    </option>
+                                @endforeach
+                            </select>
+                            <p class="text-[10px] text-slate-400">Setiap program wajib dikelola oleh satu orang penanggung jawab (Program Admin).</p>
+                        </div>
+
+                        <!-- Option B: New Admin User Registration Form -->
+                        <div x-show="adminType === 'new'" class="space-y-4 p-4 bg-slate-50 border border-slate-150 rounded-2xl" style="display: none;">
+                            <div>
+                                <label for="admin_name" class="block text-xs font-bold text-gray-600 mb-1">Nama Lengkap Admin Baru</label>
+                                <input type="text" name="admin_name" id="admin_name" :required="adminType === 'new'" value="{{ old('admin_name') }}" class="w-full rounded-xl border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-sm bg-white" placeholder="Contoh: Budi Santoso">
+                            </div>
+                            <div>
+                                <label for="admin_email" class="block text-xs font-bold text-gray-600 mb-1">Email Admin Baru</label>
+                                <input type="email" name="admin_email" id="admin_email" :required="adminType === 'new'" value="{{ old('admin_email') }}" class="w-full rounded-xl border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-sm bg-white" placeholder="budi@ashoka.org">
+                            </div>
+                            <div>
+                                <label for="admin_password" class="block text-xs font-bold text-gray-600 mb-1">Password Admin Baru</label>
+                                <input type="password" name="admin_password" id="admin_password" :required="adminType === 'new'" class="w-full rounded-xl border-gray-200 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-sm bg-white" placeholder="Minimal 8 karakter">
+                            </div>
+                        </div>
                     </div>
 
                     <div>

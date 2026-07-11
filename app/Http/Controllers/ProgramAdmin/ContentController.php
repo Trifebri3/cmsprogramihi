@@ -60,7 +60,7 @@ class ContentController extends Controller
             'status' => 'required|string|in:draft,published,archived',
             'categories' => 'nullable|array',
             'categories.*' => 'exists:categories,id',
-            'content_blocks_json' => 'required|string',
+            'content_blocks_json' => 'nullable|string',
         ]);
 
         $status = $request->status;
@@ -71,7 +71,20 @@ class ContentController extends Controller
         }
 
         // Parse and process dynamic content blocks
-        $blocksData = json_decode($request->input('content_blocks_json'), true);
+        $blocksData = [];
+        if ($request->filled('content_blocks_json')) {
+            $blocksData = json_decode($request->input('content_blocks_json'), true);
+        } elseif ($request->filled('content_text')) {
+            $blocksData = [
+                [
+                    'id' => 'b_text_legacy',
+                    'type' => 'text',
+                    'heading' => '',
+                    'body' => $request->content_text
+                ]
+            ];
+        }
+
         if (!is_array($blocksData)) {
             $blocksData = [];
         }
